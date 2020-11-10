@@ -5,8 +5,14 @@
 		<meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
 		<title>< The Chief Engineer /></title>
-		<meta content="" name="descriptison" />
-		<meta content="" name="keywords" />
+		<meta
+			content="Victor Allen, The Chief Engineer"
+			name="Hi, I’m Victor Allen. Professionally, I’m a web developer who specializes in PHP/Larevel + MySQL for back end development with a growing interest in JavaScript front end development using Vue JS. Personally, I'm a hobbyist game developer and casual gamer."
+		/>
+		<meta
+			content="Victor Allen"
+			name="Chief Engineer, Software Developer, Hobbyist Game Developer"
+		/>
 
 		<!-- Favicons -->
 		<link href="assets/img/Logo.png" rel="icon" />
@@ -30,6 +36,8 @@
 
 		<!-- Template Main CSS File -->
 		<link href="assets/css/style.css" rel="stylesheet" />
+
+		<!-- Font Family -->
 		<link
 			href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2&display=swap"
 			rel="stylesheet"
@@ -71,15 +79,14 @@
 							<a class="nav-link js-scroll" href="index.html#about">About</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link js-scroll" href="index.html#service"
-								>Services</a
+							<a class="nav-link js-scroll" href="index.html#techstack"
+								>Techstack</a
 							>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link js-scroll" href="index.html#work">Work</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link js-scroll" href="index.html#blog">Blog</a>
+							<a class="nav-link js-scroll" href="index.html#projects"
+								>Projects</a
+							>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link js-scroll" href="index.html#contact"
@@ -93,7 +100,7 @@
 
 		<div
 			class="intro intro-single route bg-image"
-			style="background-image: url(assets/img/overlay-bg.jpg)"
+			style="background-image: url(assets/img/portfolio/remss/remss_2.png)"
 		>
 			<div class="overlay-mf"></div>
 			<div class="intro-content display-table">
@@ -137,6 +144,21 @@
 								class="img-fluid"
 								alt=""
 							/>
+							<img
+								src="assets/img/portfolio/remss/remss_5.png"
+								class="img-fluid"
+								alt=""
+							/>
+							<img
+								src="assets/img/portfolio/remss/remss_6.png"
+								class="img-fluid"
+								alt=""
+							/>
+							<img
+								src="assets/img/portfolio/remss/remss_7.png"
+								class="img-fluid"
+								alt=""
+							/>
 						</div>
 
 						<div class="portfolio-info">
@@ -146,7 +168,16 @@
 								<li><strong>Client</strong>: Personal-project</li>
 								<li><strong>Project date</strong>: 20 January, 2020</li>
 								<li>
-									<strong>Project URL</strong>: <a href="#">In Development</a>
+									<strong>Live Project</strong>:
+									<a href="http://remss.herokuapp.com/" target="_blank"
+										>REMSS</a
+									>
+								</li>
+								<li>
+									<strong>Github repo</strong>:
+									<a href="http://github.com/vamuigua/remss" target="_blank"
+										>remss</a
+									>
 								</li>
 							</ul>
 						</div>
@@ -157,11 +188,27 @@
 						<p>
 							The Real Estate Management and Service System codename 'REMSS' is
 							a web application that facilitates the operations and control of
-							commercial and rental properties, a useful tool for property
-							managers.
+							commercial and rental properties. It aims at bringing efficiency
+							in management, reporting and communication between a property
+							manager and the tenants.
 						</p>
 						<h2>Technologies used:</h2>
-						<p>Laravel, PHP, Javascript, Vue JS</p>
+						<ul>
+							<li>Laravel / PHP - Handles all Backend processes</li>
+							<li>
+								Javascript - For UI resposivity and handling some http requests
+							</li>
+							<li>
+								Vue JS - Used on the Invoice forms to allow to dynamic assigning
+								of invoice items
+							</li>
+							<li>
+								Chart JS - For calculating and visually displaying expenditure
+								expenses based on Months and Year selected
+							</li>
+							<li>FullCalender - For scheduling events</li>
+							<li>Mpesa & PayPal API - for handling Online Payments</li>
+						</ul>
 					</div>
 				</div>
 			</section>
@@ -199,6 +246,7 @@
 		<script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
 		<script src="assets/vendor/typed.js/typed.min.js"></script>
 		<script src="assets/vendor/venobox/venobox.min.js"></script>
+		<script src="assets/vendor/isotope/isotope.js"></script>
 
 		<!-- Template Main JS File -->
 		<script src="assets/js/main.js"></script>
