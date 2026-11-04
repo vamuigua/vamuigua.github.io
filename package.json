@@ -1,0 +1,33 @@
+{
+  "name": "devfolio",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Victor Allen Muigua: Pixel Universe + RPG Developer portfolio",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "qa": "node scripts/qa.mjs",
+    "og": "node scripts/og-image.mjs",
+    "redirects": "node scripts/redirects.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/silkscreen": "^5.3.0",
+    "astro": "^7.4.5",
+    "lucide-static": "^1.68.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^26.6.6",
+    "axe-core": "^4.14.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22.23"
+  }
+}
