@@ -1,0 +1,93 @@
+---
+/**
+ * Generated pixel-art cover for missions without screenshots (private or
+ * proprietary work). Deterministic per slug: a dithered night sky, a pixel
+ * horizon and the mission's icon in a glowing frame.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  seed: string;
+  label: string;
+}
+
+const { icon, seed, label } = Astro.props;
+
+let h = 0;
+for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+const rand = () => {
+  h = (h * 1664525 + 1013904223) >>> 0;
+  return h / 4294967296;
+};
+
+const hues = [
+  ['#2a2553', '#463f82'],
+  ['#1f3550', '#2f5d7a'],
+  ['#3a2550', '#6a3f82'],
+  ['#21403a', '#2f6b5a'],
+];
+const [ridgeA, ridgeB] = hues[Math.floor(rand() * hues.length)];
+
+// ridge silhouette on a 128×72 grid
+const cols = 128;
+let y = 48 + rand() * 8;
+const ridge: string[] = [];
+for (let x = 0; x < cols; x++) {
+  y += (rand() - 0.5) * 3.2;
+  y = Math.max(36, Math.min(60, y));
+  ridge.push(`M${x} ${Math.round(y)}h1v${72 - Math.round(y)}h-1z`);
+}
+const stars = Array.from({ length: 46 }, () => [Math.floor(rand() * cols), Math.floor(rand() * 34)]);
+---
+
+<div class="emblem" role="img" aria-label={`${label} (illustration)`}>
+  <svg class="emblem__bg" viewBox="0 0 128 72" preserveAspectRatio="xMidYMid slice" shape-rendering="crispEdges" aria-hidden="true">
+    <defs>
+      <linearGradient id={`g-${seed}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#080a17"></stop>
+        <stop offset="0.6" stop-color="#1c1b3e"></stop>
+        <stop offset="1" stop-color="#452a56"></stop>
+      </linearGradient>
+    </defs>
+    <rect width="128" height="72" fill={`url(#g-${seed})`}></rect>
+    {stars.map(([sx, sy]) => <rect x={sx} y={sy} width="1" height="1" fill="#cfc6ff" opacity={0.4 + (sx % 5) / 8} />)}
+    <path d={ridge.join('')} fill={ridgeA}></path>
+    <path d={ridge.map((d) => d.replace(/v\d+/, 'v1')).join('')} fill={ridgeB}></path>
+    <rect y="62" width="128" height="10" fill="#141127"></rect>
+  </svg>
+  <span class="emblem__badge">
+    <Icon name={icon} />
+  </span>
+</div>
+
+<style>
+  .emblem {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  .emblem__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .emblem__badge {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    font-size: 2rem;
+    color: var(--ember);
+    background: rgb(6 7 14 / 0.75);
+    border: 2px solid rgb(255 181 71 / 0.55);
+    box-shadow: 0 0 40px rgb(255 143 63 / 0.35), inset 0 0 18px rgb(255 181 71 / 0.12);
+  }
+</style>

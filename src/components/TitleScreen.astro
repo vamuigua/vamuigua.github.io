@@ -1,0 +1,410 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import { url } from '../lib/url';
+import { missions } from '../data/projects';
+
+const years = new Date().getFullYear() - profile.professionalSince;
+---
+
+<section class="title" id="top" aria-labelledby="hero-title">
+  <canvas class="title__world" data-world aria-hidden="true"></canvas>
+  <div class="title__noscript-sky" aria-hidden="true"></div>
+
+  <div class="title__content container">
+    <div class="title__copy">
+      <p class="eyebrow eyebrow--jade title__eyebrow">
+        Player 1 · {profile.location}
+      </p>
+      <h1 id="hero-title" class="title__name">
+        Victor Allen <span>Muigua</span>
+      </h1>
+      <p class="title__class">
+        <span class="title__class-badge pixel">Class</span>
+        {profile.role}
+      </p>
+      <p class="title__intro">{profile.intro}</p>
+
+      <nav class="title__menu panel pixel-frame" aria-label="Start menu" data-title-menu>
+        <ul>
+          <li>
+            <a href="#profile" data-menu-item>
+              <span class="cursor" aria-hidden="true">▶</span>
+              <span class="label">Start exploring</span>
+              <span class="hint">Walk through the world</span>
+            </a>
+          </li>
+          <li>
+            <a href="#missions" data-menu-item>
+              <span class="cursor" aria-hidden="true">▶</span>
+              <span class="label">View projects</span>
+              <span class="hint">{missions.length} missions</span>
+            </a>
+          </li>
+          <li>
+            <a href={url(profile.cv)} download data-menu-item>
+              <span class="cursor" aria-hidden="true">▶</span>
+              <span class="label">Download CV</span>
+              <span class="hint">PDF</span>
+            </a>
+          </li>
+          <li>
+            <a href="#contact" data-menu-item>
+              <span class="cursor" aria-hidden="true">▶</span>
+              <span class="label">Get in touch</span>
+              <span class="hint">{profile.email}</span>
+            </a>
+          </li>
+        </ul>
+        <p class="title__keys pixel" aria-hidden="true">↑↓ select · Enter confirm · Q quick view</p>
+      </nav>
+    </div>
+
+    <ul class="title__stats" aria-label="At a glance">
+      <li>
+        <span class="stat__k pixel">EXP</span>
+        <span class="stat__v">{years}+ yrs</span>
+        <span class="stat__d">shipping production systems</span>
+      </li>
+      <li>
+        <span class="stat__k pixel">Guild</span>
+        <span class="stat__v">Solutech</span>
+        <span class="stat__d">Senior Full Stack Engineer</span>
+      </li>
+      <li>
+        <span class="stat__k pixel">Cert</span>
+        <span class="stat__v">KCNA</span>
+        <span class="stat__d">Kubernetes & Cloud Native</span>
+      </li>
+    </ul>
+  </div>
+
+  <a class="title__scroll" href="#profile" aria-label="Scroll to profile">
+    <span class="pixel">Scroll</span>
+    <Icon name="chevron-down" />
+  </a>
+</section>
+
+<style>
+  .title {
+    position: relative;
+    min-height: max(640px, 100svh);
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+    background: #0b0e1f;
+  }
+
+  .title__world,
+  .title__noscript-sky {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+  }
+
+  .title__world {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    cursor: default;
+  }
+
+  .title__noscript-sky {
+    z-index: -3;
+    background: linear-gradient(180deg, #080a17 0%, #1c1b3e 50%, #5b3158 82%, #141127 82%);
+  }
+
+  /* readability scrim behind the copy */
+  .title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgb(6 7 14 / 0.72) 0%, rgb(6 7 14 / 0.38) 38%, rgb(6 7 14 / 0) 62%),
+      linear-gradient(0deg, var(--night-900) 0%, rgb(10 12 25 / 0) 18%);
+  }
+
+  .title__content {
+    position: relative;
+    display: grid;
+    gap: var(--s-6);
+    padding-top: calc(var(--hud-h) + clamp(2rem, 7vh, 5rem));
+    padding-bottom: clamp(5rem, 12vh, 8rem);
+  }
+
+  .title__copy {
+    max-width: 620px;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .title__name {
+    font-size: clamp(2.6rem, 1.6rem + 4.6vw, 5.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    text-shadow: 0 2px 30px rgb(6 7 14 / 0.6);
+  }
+
+  .title__name span {
+    display: block;
+    background: linear-gradient(90deg, var(--ember) 0%, #ffd38a 55%, var(--text) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .title__class {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .title__class-badge {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    padding: 4px 7px;
+    background: var(--jade);
+    color: #062016;
+  }
+
+  .title__intro {
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    max-width: 52ch;
+  }
+
+  /* Start menu */
+  .title__menu {
+    margin-top: var(--s-3);
+    padding: 10px;
+    max-width: 460px;
+    background: rgb(12 14 30 / 0.72);
+    border: 1px solid var(--line-strong);
+  }
+
+  .title__menu ul {
+    list-style: none;
+    display: grid;
+    gap: 2px;
+  }
+
+  .title__menu a {
+    display: grid;
+    grid-template-columns: 18px auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    text-decoration: none;
+    border-radius: 6px;
+    outline-offset: -2px;
+    transition: background-color var(--t-fast);
+  }
+
+  .title__menu .cursor {
+    color: var(--ember);
+    font-size: 0.7rem;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+      opacity var(--t-fast),
+      transform var(--t-fast) var(--ease-out);
+  }
+
+  .title__menu .label {
+    font-weight: 600;
+    font-size: 1.02rem;
+  }
+
+  .title__menu .hint {
+    justify-self: end;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .title__menu a:hover,
+  .title__menu a:focus-visible,
+  .title__menu a.is-active {
+    background: rgb(255 181 71 / 0.1);
+  }
+
+  .title__menu a:hover .cursor,
+  .title__menu a:focus-visible .cursor,
+  .title__menu a.is-active .cursor {
+    opacity: 1;
+    transform: none;
+    animation: nudge 0.9s steps(2) infinite;
+  }
+
+  .title__menu a:first-child .label {
+    color: var(--text);
+  }
+
+  .title__keys {
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    padding: 8px 12px 2px;
+    text-transform: uppercase;
+  }
+
+  @keyframes nudge {
+    50% {
+      transform: translateX(2px);
+    }
+  }
+
+  .title__stats {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .title__stats li {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 10px;
+    align-items: baseline;
+    padding: 10px 14px;
+    background: rgb(12 14 30 / 0.6);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .stat__k {
+    font-size: 0.6rem;
+    color: var(--ember);
+    text-transform: uppercase;
+  }
+
+  .stat__v {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .stat__d {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .title__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    translate: -50% 0;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .title__scroll :global(.icon) {
+    animation: bob 1.6s var(--ease-in-out) infinite;
+  }
+
+  @keyframes bob {
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  @media (min-width: 961px) {
+    .title__stats {
+      position: absolute;
+      right: var(--gutter);
+      top: calc(var(--hud-h) + 28px);
+      flex-direction: column;
+      align-items: stretch;
+      width: 230px;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .title {
+      align-items: start;
+    }
+
+    .title::after {
+      background:
+        linear-gradient(180deg, rgb(6 7 14 / 0.55) 0%, rgb(6 7 14 / 0.25) 55%, rgb(6 7 14 / 0) 75%),
+        linear-gradient(0deg, var(--night-900) 0%, rgb(10 12 25 / 0) 12%);
+    }
+
+    .title__content {
+      padding-bottom: 46vh;
+    }
+
+    .title__stats li {
+      flex: 1 1 140px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .title__content {
+      padding-bottom: 38vh;
+    }
+
+    .title__menu .hint {
+      display: none;
+    }
+
+    .title__keys {
+      display: none;
+    }
+
+    .title__stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .title__stats li {
+      grid-template-columns: 1fr;
+      row-gap: 2px;
+      padding: 8px 10px;
+    }
+
+    .stat__v {
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .title__menu {
+      padding: 6px;
+    }
+
+    .title__menu a {
+      grid-template-columns: 12px 1fr;
+      gap: 8px;
+      padding: 10px 10px;
+    }
+
+    .stat__d {
+      display: none;
+    }
+
+    .title__scroll {
+      display: none;
+    }
+  }
+</style>

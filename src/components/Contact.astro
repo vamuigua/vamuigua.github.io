@@ -1,0 +1,237 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import { url } from '../lib/url';
+
+const socials = [
+  { label: 'LinkedIn', handle: 'victor-allen-muigua', href: profile.links.linkedin, icon: 'linkedin' },
+  { label: 'GitHub', handle: '@vamuigua', href: profile.links.github, icon: 'github' },
+  { label: 'X / Twitter', handle: '@VictorAllen22', href: profile.links.x, icon: 'brand-x' },
+  { label: 'itch.io', handle: 'Vocast Games', href: profile.links.itch, icon: 'gamepad-2' },
+];
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-title" data-region>
+  <canvas class="contact__world" data-world-end aria-hidden="true"></canvas>
+  <div class="container contact__inner">
+    <div class="terminal panel pixel-frame" data-reveal>
+      <div class="terminal__bar" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <p class="pixel">save_point.exe</p>
+      </div>
+      <div class="terminal__body">
+        <p class="eyebrow">06 · Save point reached</p>
+        <h2 id="contact-title">Ready to start a new quest together?</h2>
+        <p class="lead">
+          Whether it’s a role, a collaboration or a backend problem worth untangling, my inbox is open.
+        </p>
+
+        <div class="contact__primary">
+          <a class="btn btn--primary contact__mail" href={`mailto:${profile.email}`}>
+            <Icon name="mail" />
+            {profile.email}
+          </a>
+          <button class="btn" type="button" data-copy={profile.email} aria-describedby="copy-status">
+            <Icon name="copy" /> <span data-copy-label>Copy email</span>
+          </button>
+          <span id="copy-status" class="sr-only" aria-live="polite" data-copy-status></span>
+          <a class="btn" href={url(profile.cv)} download>
+            <Icon name="download" /> Download CV
+          </a>
+        </div>
+
+        <ul class="socials">
+          {
+            socials.map((s) => (
+              <li>
+                <a href={s.href} target="_blank" rel="noopener me">
+                  <span class="socials__icon">
+                    <Icon name={s.icon} />
+                  </span>
+                  <span class="socials__text">
+                    <span class="socials__label">{s.label}</span>
+                    <span class="socials__handle">{s.handle}</span>
+                  </span>
+                  <Icon name="arrow-up-right" class="socials__arrow" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="contact__meta dim">
+          <Icon name="map-pin" /> {profile.location} (EAT, UTC+3) ·
+          <a href={profile.phoneHref}>{profile.phone}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    isolation: isolate;
+    min-height: max(720px, 100svh);
+    display: grid;
+    align-items: center;
+    padding-block: clamp(5rem, 10vw, 8rem) clamp(9rem, 22vh, 14rem);
+    overflow: hidden;
+  }
+
+  .contact__world {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .contact::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, var(--night-900) 0%, rgb(10 12 25 / 0.2) 22%, rgb(10 12 25 / 0) 60%);
+    pointer-events: none;
+  }
+
+  .terminal {
+    max-width: 720px;
+    background: rgb(10 12 25 / 0.82);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-2);
+  }
+
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .terminal__bar span {
+    width: 9px;
+    height: 9px;
+    background: var(--night-600);
+  }
+
+  .terminal__bar span:first-child {
+    background: var(--ember);
+  }
+
+  .terminal__bar p {
+    margin-left: auto;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+
+  .terminal__body {
+    padding: clamp(22px, 5vw, 40px);
+    display: grid;
+    gap: 16px;
+  }
+
+  .terminal__body h2 {
+    font-size: var(--step-3);
+  }
+
+  .contact__primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .contact__mail {
+    font-size: 1rem;
+  }
+
+  .socials {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .socials a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line);
+    background: rgb(255 255 255 / 0.02);
+    text-decoration: none;
+    transition: border-color var(--t-fast), background-color var(--t-fast), transform var(--t-fast) var(--ease-out);
+  }
+
+  .socials a:hover {
+    border-color: rgb(255 181 71 / 0.4);
+    background: rgb(255 181 71 / 0.05);
+    transform: translateY(-1px);
+  }
+
+  .socials__icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    background: rgb(255 255 255 / 0.05);
+    font-size: 1.05rem;
+  }
+
+  .socials__text {
+    display: grid;
+    line-height: 1.25;
+    min-width: 0;
+  }
+
+  .socials__label {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .socials__handle {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .socials :global(.socials__arrow) {
+    color: var(--text-dim);
+  }
+
+  .contact__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.88rem;
+  }
+
+  .contact__meta a {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 560px) {
+    .socials {
+      grid-template-columns: 1fr;
+    }
+
+    .contact__primary .btn {
+      flex: 1 1 100%;
+    }
+
+    .contact__mail {
+      font-size: 0.92rem;
+    }
+  }
+</style>

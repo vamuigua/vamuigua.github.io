@@ -1,0 +1,319 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import portrait from '../assets/profile/victor.jpg';
+import { profile } from '../data/profile';
+
+const sheet = [
+  { k: 'Class', v: profile.role },
+  { k: 'Guild', v: profile.currentGuild },
+  { k: 'Base', v: profile.location },
+  { k: 'In the field since', v: String(profile.professionalSince) },
+  { k: 'Main stack', v: 'Laravel · Vue · Redis · MySQL' },
+  { k: 'Certification', v: 'KCNA (CNCF)' },
+];
+---
+
+<section class="section profile" id="profile" aria-labelledby="profile-title" data-region>
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow">01 · Character profile</p>
+      <h2 id="profile-title">The engineer behind the controller</h2>
+      <p>Backend-leaning full stack engineer, integration specialist, and a gamer since childhood.</p>
+    </header>
+
+    <div class="profile__grid">
+      <aside class="sheet panel" data-reveal aria-label="Character sheet">
+        <div class="sheet__portrait">
+          <Picture
+            src={portrait}
+            formats={['avif']}
+            fallbackFormat="webp"
+            widths={[320, 480, 640]}
+            sizes="(max-width: 700px) 80vw, 340px"
+            alt="Portrait of Victor Allen Muigua"
+            loading="lazy"
+            class="sheet__img"
+          />
+          <span class="sheet__frame" aria-hidden="true"></span>
+          <span class="sheet__status pixel"><span class="dot dot--pulse"></span> Online</span>
+        </div>
+        <div class="sheet__body">
+          <p class="sheet__name">{profile.name}</p>
+          <dl class="sheet__list">
+            {
+              sheet.map((row) => (
+                <div>
+                  <dt>{row.k}</dt>
+                  <dd>{row.v}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </aside>
+
+      <div class="profile__main">
+        <div class="profile__bio stack" data-reveal>
+          {profile.bio.map((p, i) => <p class={i === 0 ? 'lead' : 'muted'}>{p}</p>)}
+        </div>
+
+        <h3 class="profile__h" data-reveal>Traits</h3>
+        <ul class="traits">
+          {
+            profile.traits.map((t, i) => (
+              <li class="trait panel" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+                <span class="trait__icon">
+                  <Icon name={t.icon} />
+                </span>
+                <div>
+                  <h4>{t.title}</h4>
+                  <p>{t.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="objective panel" data-reveal>
+          <div class="objective__marker" aria-hidden="true">!</div>
+          <div class="objective__body">
+            <p class="eyebrow eyebrow--jade">Current objective</p>
+            <h3>{profile.currentObjective.title}</h3>
+            <p class="muted">{profile.currentObjective.detail}</p>
+            <ul class="chips">{profile.currentObjective.items.map((i) => <li class="chip">{i}</li>)}</ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .profile__grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  /* Character sheet */
+  .sheet {
+    position: sticky;
+    top: calc(var(--hud-h) + 24px);
+    overflow: hidden;
+    padding: 14px;
+  }
+
+  .sheet__portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--night-750);
+  }
+
+  .sheet__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
+    filter: saturate(0.95) contrast(1.03);
+  }
+
+  /* pixel corner brackets */
+  .sheet__frame {
+    position: absolute;
+    inset: 10px;
+    pointer-events: none;
+    --c: var(--ember);
+    background:
+      linear-gradient(var(--c) 0 0) top left / 18px 3px,
+      linear-gradient(var(--c) 0 0) top left / 3px 18px,
+      linear-gradient(var(--c) 0 0) top right / 18px 3px,
+      linear-gradient(var(--c) 0 0) top right / 3px 18px,
+      linear-gradient(var(--c) 0 0) bottom left / 18px 3px,
+      linear-gradient(var(--c) 0 0) bottom left / 3px 18px,
+      linear-gradient(var(--c) 0 0) bottom right / 18px 3px,
+      linear-gradient(var(--c) 0 0) bottom right / 3px 18px;
+    background-repeat: no-repeat;
+  }
+
+  .sheet__status {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--jade);
+    background: rgb(6 7 14 / 0.75);
+  }
+
+  .sheet__body {
+    padding: 18px 6px 6px;
+  }
+
+  .sheet__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .sheet__list {
+    margin: 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .sheet__list div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    font-size: 0.9rem;
+  }
+
+  .sheet__list dt {
+    color: var(--text-dim);
+  }
+
+  .sheet__list dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .profile__main {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .profile__bio .lead {
+    color: var(--text);
+  }
+
+  .profile__h {
+    font-size: var(--step-2);
+    margin-top: var(--s-4);
+  }
+
+  .traits {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .trait {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    padding: 18px;
+    border-radius: var(--r-md);
+    transition:
+      border-color var(--t-fast),
+      transform var(--t-fast) var(--ease-out);
+  }
+
+  .trait:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+  }
+
+  .trait__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    background: var(--ember-soft);
+    color: var(--ember);
+    font-size: 1.1rem;
+  }
+
+  .trait h4 {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .trait p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  .objective {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    padding: 22px;
+    border-radius: var(--r-md);
+    border-color: rgb(94 230 176 / 0.25);
+    background: linear-gradient(135deg, rgb(94 230 176 / 0.08), rgb(20 24 50 / 0.5) 60%);
+  }
+
+  .objective__marker {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    font-family: var(--font-pixel);
+    font-size: 1.2rem;
+    color: #062016;
+    background: var(--jade);
+    animation: float 2.4s var(--ease-in-out) infinite;
+  }
+
+  .objective__body {
+    display: grid;
+    gap: 8px;
+  }
+
+  .objective h3 {
+    font-size: var(--step-1);
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (max-width: 960px) {
+    .profile__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sheet {
+      position: relative;
+      top: 0;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .sheet__body {
+      padding: 0;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .sheet {
+      grid-template-columns: 1fr;
+    }
+
+    .sheet__portrait {
+      aspect-ratio: 1 / 1;
+    }
+
+    .traits {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

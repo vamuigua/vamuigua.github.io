@@ -1,0 +1,282 @@
+---
+import Icon from './Icon.astro';
+import { chapters } from '../data/experience';
+import { missions } from '../data/projects';
+import { url } from '../lib/url';
+
+const titleOf = (slug: string) => missions.find((m) => m.slug === slug)?.title ?? slug;
+---
+
+<section class="section journey" id="journey" aria-labelledby="journey-title" data-region>
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow">02 · The journey</p>
+      <h2 id="journey-title">Experience, chapter by chapter</h2>
+      <p>Five chapters so far, from a bootcamp in 2016 to owning the core platform at Solutech. Most recent first.</p>
+    </header>
+
+    <ol class="path">
+      {
+        chapters.map((c, i) => (
+          <li class:list={['node', c.kind, { current: c.current }]} data-reveal>
+            <div class="node__marker" aria-hidden="true">
+              <span class="node__flag">
+                <Icon name={c.kind === 'work' ? 'briefcase' : 'graduation-cap'} />
+              </span>
+            </div>
+            <article class="node__card panel">
+              <header class="node__head">
+                <div class="node__meta">
+                  <span class="tag tag--ember">{c.chapter}</span>
+                  {c.current && (
+                    <span class="tag tag--jade">
+                      <span class="dot dot--pulse" /> Current
+                    </span>
+                  )}
+                  {c.kind === 'education' && <span class="tag">Training arc</span>}
+                </div>
+                <time class="node__time">
+                  {c.start} – {c.end}
+                </time>
+              </header>
+              <h3 class="node__title">{c.title}</h3>
+              <p class="node__org">
+                {c.orgUrl ? (
+                  <a href={c.orgUrl} target="_blank" rel="noopener">
+                    {c.org}
+                  </a>
+                ) : (
+                  c.org
+                )}
+                <span class="dim"> · {c.location}</span>
+              </p>
+              <p class="node__summary">{c.summary}</p>
+
+              <details class="node__quests" open={i < 3}>
+                <summary>
+                  <span class="pixel">Key quests</span>
+                  <span class="dim">({c.quests.length})</span>
+                  <Icon name="chevron-down" class="node__chev" />
+                </summary>
+                <ul>
+                  {c.quests.map((q) => (
+                    <li>{q}</li>
+                  ))}
+                </ul>
+              </details>
+
+              <div class="node__foot">
+                <ul class="chips" aria-label="Technologies">
+                  {c.stack.map((s) => (
+                    <li class="chip">{s}</li>
+                  ))}
+                </ul>
+                {c.missions && (
+                  <p class="node__missions">
+                    <span class="dim">Related missions:</span>{' '}
+                    {c.missions.map((m, j) => (
+                      <>
+                        <a href={url(`missions/${m}/`)}>{titleOf(m)}</a>
+                        {j < c.missions!.length - 1 ? ', ' : ''}
+                      </>
+                    ))}
+                  </p>
+                )}
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .path {
+    list-style: none;
+    position: relative;
+    display: grid;
+    gap: 22px;
+    padding-left: 56px;
+  }
+
+  /* the dotted trail on the map */
+  .path::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background-image: linear-gradient(var(--line-strong) 50%, transparent 50%);
+    background-size: 2px 10px;
+  }
+
+  .node {
+    position: relative;
+  }
+
+  .node__marker {
+    position: absolute;
+    left: -56px;
+    top: 22px;
+    width: 40px;
+    display: grid;
+    place-items: center;
+  }
+
+  .node__flag {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    background: var(--night-750);
+    border: 2px solid var(--line-strong);
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .work .node__flag {
+    color: var(--ember);
+    border-color: rgb(255 181 71 / 0.5);
+  }
+
+  .current .node__flag {
+    background: var(--ember);
+    border-color: var(--ember);
+    color: var(--ember-ink);
+    box-shadow: 0 0 0 6px rgb(255 181 71 / 0.12), 0 0 28px rgb(255 143 63 / 0.5);
+  }
+
+  .node__card {
+    padding: clamp(18px, 3vw, 28px);
+    border-radius: var(--r-lg);
+  }
+
+  .current .node__card {
+    border-color: rgb(255 181 71 / 0.28);
+  }
+
+  .node__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .node__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .node__time {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .node__title {
+    font-size: var(--step-2);
+  }
+
+  .node__org {
+    margin-top: 4px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .node__org a {
+    text-decoration-color: rgb(255 181 71 / 0.5);
+  }
+
+  .node__summary {
+    margin-top: 12px;
+    color: var(--text-muted);
+    max-width: 70ch;
+  }
+
+  .node__quests {
+    margin-top: 16px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+
+  .node__quests summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: var(--ember);
+    padding: 4px 0;
+  }
+
+  .node__quests summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .node__quests :global(.node__chev) {
+    transition: transform var(--t-fast);
+  }
+
+  .node__quests[open] :global(.node__chev) {
+    transform: rotate(180deg);
+  }
+
+  .node__quests ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .node__quests li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--text);
+    font-size: 0.97rem;
+    max-width: 78ch;
+  }
+
+  .node__quests li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    background: var(--jade);
+  }
+
+  .node__foot {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .node__missions {
+    font-size: 0.9rem;
+  }
+
+  .node__missions a {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration-color: rgb(255 181 71 / 0.5);
+  }
+
+  @media (max-width: 560px) {
+    .path {
+      padding-left: 0;
+    }
+
+    .path::before,
+    .node__marker {
+      display: none;
+    }
+  }
+</style>
