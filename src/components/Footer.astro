@@ -1,0 +1,36 @@
+---
+import { profile } from '../data/profile';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p>
+      © {year} {profile.name}. Designed & built with Astro and hand-coded pixel art.
+    </p>
+    <p class="footer__egg pixel" aria-hidden="true">↑ ↑ ↓ ↓ ← → ← → B A</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    background: var(--night-950);
+    padding-block: 22px calc(22px + env(safe-area-inset-bottom));
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .footer__egg {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+  }
+</style>

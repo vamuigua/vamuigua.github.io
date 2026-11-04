@@ -1,0 +1,92 @@
+/* ==========================================================================
+   Design tokens: "Dusk at the Highlands Camp"
+   Warm firelight (ember) vs cool night (indigo) carries the hierarchy.
+   ========================================================================== */
+:root {
+  color-scheme: dark;
+
+  /* Night: backgrounds & surfaces */
+  --night-950: #06070e;
+  --night-900: #0a0c19;
+  --night-850: #0f1224;
+  --night-800: #141832;
+  --night-750: #1a1f3f;
+  --night-700: #20264b;
+  --night-600: #2c3263;
+
+  /* Text */
+  --text: #eef0fb;
+  --text-muted: #b0b5d6;
+  --text-dim: #8288b2;
+
+  /* Accents */
+  --ember: #ffb547;
+  --ember-strong: #ff8f3f;
+  --ember-soft: rgb(255 181 71 / 0.14);
+  --ember-ink: #231203;
+  --jade: #5ee6b0;
+  --jade-soft: rgb(94 230 176 / 0.12);
+  --lavender: #b9a7ff;
+  --lavender-soft: rgb(185 167 255 / 0.12);
+  --sky: #82c8ff;
+  --rose: #ff8aa3;
+
+  /* Lines & glass */
+  --line: rgb(176 186 255 / 0.10);
+  --line-strong: rgb(176 186 255 / 0.20);
+  --glass: rgb(20 24 50 / 0.72);
+  --glass-strong: rgb(16 19 40 / 0.9);
+
+  /* Type */
+  --font-display: 'Bricolage Grotesque Variable', 'Inter Variable', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-pixel: 'Silkscreen', ui-monospace, monospace;
+
+  --step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.875rem);
+  --step-0: clamp(0.98rem, 0.95rem + 0.15vw, 1.0625rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
+  --step-2: clamp(1.4rem, 1.25rem + 0.7vw, 1.85rem);
+  --step-3: clamp(1.8rem, 1.5rem + 1.4vw, 2.75rem);
+  --step-4: clamp(2.4rem, 1.8rem + 3vw, 4.6rem);
+
+  /* Space (4px grid) */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --max: 1200px;
+  --hud-h: 64px;
+
+  /* Shape */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --pixel-notch: 6px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-2: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 24px 48px -20px rgb(0 0 0 / 0.75);
+  --glow-ember: 0 0 0 1px rgb(255 181 71 / 0.4), 0 10px 40px -10px rgb(255 143 63 / 0.55);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-fast: 160ms;
+  --t-med: 280ms;
+  --t-slow: 600ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-med: 0ms;
+    --t-slow: 0ms;
+  }
+}
