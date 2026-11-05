@@ -35,23 +35,62 @@ All copy lives in typed data files, so most updates never touch a component:
 
 **CV:** replace `public/Victor_Allen_Muigua_CV.pdf` (keep the filename).
 
-## Develop
+## Running locally
+
+### Prerequisites
+
+- **Node.js 22.23 or newer** (Astro 7 requirement; developed on Node 24). Check with `node -v`.
+- **npm** (bundled with Node).
+- **Git**.
+- *Optional:* Google Chrome, which is only needed for the QA and OG-image scripts.
+
+### 1. Clone and install
 
 ```bash
+git clone https://github.com/vamuigua/devfolio.git
+cd devfolio
+git checkout feature/game-inspired-portfolio-redesign   # until the redesign is merged into main
 npm install
-npm run dev        # http://localhost:4321/devfolio/
-npm run check      # type-check .astro + .ts
-npm run build      # → dist/
-npm run preview    # serve dist/ at http://localhost:4321/devfolio/
 ```
 
-QA and social image (uses your installed Chrome via `playwright-core`; set `CHROME_PATH` if needed):
+### 2. Start the dev server
 
 ```bash
-npm run preview    # in one terminal
-npm run qa         # axe-core a11y, broken links, overflow, console errors, interactions
-npm run og         # regenerate public/og.png + PNG favicons
+npm run dev
 ```
+
+Open **http://localhost:4321/devfolio/**. The `/devfolio/` path is required because the site is configured for GitHub Pages at that base (`astro.config.mjs`), so `http://localhost:4321/` on its own shows a 404. Saving a file reloads the page automatically.
+
+To use another port: `npm run dev -- --port 3000`.
+
+### 3. Build and preview the production version
+
+```bash
+npm run build      # outputs the static site to dist/
+npm run preview    # serves dist/ at http://localhost:4321/devfolio/
+```
+
+### Other commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run check` | Type-checks `.astro` and `.ts` files |
+| `npm run qa` | Runs accessibility (axe-core), broken-link, overflow, console-error and interaction checks against a running server |
+| `npm run og` | Regenerates `public/og.png` and the PNG favicons from the running site |
+| `npm run redirects` | Regenerates the legacy `*.html` redirect stubs in `public/` |
+
+`npm run qa` and `npm run og` drive your installed Chrome through `playwright-core`, so no browser download is needed. Start `npm run preview` (or `npm run dev`) in another terminal first. Set `CHROME_PATH` if Chrome isn't at the default Windows location, and `SITE_URL` if the server isn't at `http://localhost:4321/devfolio/`:
+
+```bash
+CHROME_PATH="/usr/bin/google-chrome" SITE_URL="http://localhost:4321/devfolio/" npm run qa
+```
+
+### Troubleshooting
+
+- **404 at `localhost:4321`**: add `/devfolio/` to the URL.
+- **`Unsupported engine` or Astro fails to start**: upgrade Node to 22.23 or newer.
+- **Port already in use**: stop the other process or pass `--port` as shown above.
+- **Images look stale after replacing a screenshot**: stop the server, delete `node_modules/.astro`, then run `npm run dev` again.
 
 ## Deploying (after approval)
 
