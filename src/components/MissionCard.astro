@@ -1,0 +1,329 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import Emblem from './Emblem.astro';
+import { type Mission, tierLabel, statusLabel, categoryLabel } from '../data/projects';
+import { shotsFor } from '../lib/missionImages';
+import { url } from '../lib/url';
+
+interface Props {
+  mission: Mission;
+  featured?: boolean;
+  index?: number;
+}
+
+const { mission: m, featured = false, index = 0 } = Astro.props;
+const shots = shotsFor(m.slug);
+const cover = shots[m.cover ?? 0];
+const coverAlt = m.shots[m.cover ?? 0] ?? '';
+const href = url(`missions/${m.slug}/`);
+const statusTone: Record<string, string> = {
+  live: 'jade',
+  published: 'jade',
+  'in-dev': 'ember',
+  code: 'dim',
+  private: '',
+  offline: 'rose',
+  archived: 'dim',
+};
+---
+
+<li
+  class:list={['card', `card--${m.tier}`, { 'card--featured': featured }]}
+  data-mission
+  data-categories={m.categories.join(' ')}
+  data-reveal
+  style={`--reveal-delay:${(index % 3) * 60}ms`}
+>
+  <article class="card__inner">
+    <a class="card__media" href={href} tabindex="-1" aria-hidden="true">
+      {
+        cover ? (
+          <Picture
+            src={cover}
+            formats={['avif']}
+            fallbackFormat="webp"
+            widths={featured ? [480, 720, 960] : [400, 600]}
+            sizes={featured ? '(max-width: 760px) 100vw, 50vw' : '(max-width: 760px) 100vw, 33vw'}
+            alt={coverAlt}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <Emblem icon={m.emblem ?? 'sparkles'} seed={m.slug} label={m.title} />
+        )
+      }
+      <span class:list={['card__tier', 'pixel', `tier-${m.tier}`]}>{tierLabel[m.tier]}</span>
+    </a>
+
+    <div class="card__body">
+      <div class="card__meta">
+        <span class:list={['tag', statusTone[m.status] && `tag--${statusTone[m.status]}`]}>
+          {m.status === 'private' && <Icon name="lock" />}
+          {statusLabel[m.status]}
+        </span>
+        <span class="card__cats">{m.categories.map((c) => categoryLabel[c]).join(' · ')}</span>
+      </div>
+      <h3 class="card__title">
+        <a href={href}>{m.title}</a>
+        {m.aka && <span class="card__aka">formerly {m.aka}</span>}
+      </h3>
+      <p class="card__summary">{m.summary}</p>
+      <ul class="chips card__stack" aria-label="Stack">
+        {m.stack.slice(0, featured ? 5 : 3).map((s) => <li class="chip">{s.name}</li>)}
+      </ul>
+      <div class="card__links">
+        <a class="card__cta" href={href}>
+          Open dossier <Icon name="arrow-right" />
+        </a>
+        {
+          m.links.live && (
+            <a class="card__ext" href={m.links.live} target="_blank" rel="noopener" aria-label={`${m.title} live site (opens in new tab)`}>
+              <Icon name="external-link" />
+            </a>
+          )
+        }
+        {
+          m.links.itch && (
+            <a class="card__ext" href={m.links.itch} target="_blank" rel="noopener" aria-label={`${m.title} on itch.io (opens in new tab)`}>
+              <Icon name="gamepad-2" />
+            </a>
+          )
+        }
+        {
+          m.links.github && (
+            <a class="card__ext" href={m.links.github} target="_blank" rel="noopener" aria-label={`${m.title} source on GitHub (opens in new tab)`}>
+              <Icon name="github" />
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </article>
+</li>
+
+<style>
+  .card {
+    list-style: none;
+    display: flex;
+  }
+
+  .card[hidden] {
+    display: none;
+  }
+
+  .card__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgb(32 38 75 / 0.5), rgb(16 19 40 / 0.6));
+    box-shadow: var(--shadow-1);
+    transition:
+      transform var(--t-med) var(--ease-out),
+      border-color var(--t-med) var(--ease-out),
+      box-shadow var(--t-med) var(--ease-out);
+  }
+
+  .card__inner:hover,
+  .card__inner:focus-within {
+    transform: translateY(-4px);
+    border-color: rgb(255 181 71 / 0.35);
+    box-shadow: var(--shadow-2), 0 0 0 1px rgb(255 181 71 / 0.12);
+  }
+
+  .card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--night-750);
+  }
+
+  .card__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform var(--t-slow) var(--ease-out);
+  }
+
+  .card__inner:hover .card__media :global(img) {
+    transform: scale(1.035);
+  }
+
+  .card__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgb(10 12 25 / 0.55));
+    pointer-events: none;
+  }
+
+  .card__tier {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    padding: 5px 8px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    background: rgb(6 7 14 / 0.82);
+    color: var(--text-muted);
+  }
+
+  .tier-main {
+    color: var(--ember);
+  }
+
+  .tier-game {
+    color: var(--jade);
+  }
+
+  .tier-side {
+    color: var(--lavender);
+  }
+
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px 20px;
+    flex: 1;
+  }
+
+  .card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+
+  .card__meta .tag :global(.icon) {
+    width: 0.95em;
+    height: 0.95em;
+  }
+
+  .card__cats {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .card__title {
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+
+  .card__title a {
+    text-decoration: none;
+  }
+
+  /* whole-card click target */
+  .card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .card__aka {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--text-dim);
+  }
+
+  .card__summary {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .card__stack {
+    margin-top: auto;
+    padding-top: 6px;
+  }
+
+  .card__links {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--ember);
+    text-decoration: none;
+    padding: 6px 0;
+  }
+
+  .card__cta :global(.icon) {
+    transition: transform var(--t-fast) var(--ease-out);
+  }
+
+  .card__inner:hover .card__cta :global(.icon) {
+    transform: translateX(3px);
+  }
+
+  .card__ext {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-sm);
+    color: var(--text-muted);
+    border: 1px solid var(--line);
+    transition: color var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
+  }
+
+  .card__ext:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .card--featured .card__title {
+    font-size: var(--step-2);
+  }
+
+  .card--archive .card__inner {
+    opacity: 0.85;
+  }
+
+  /* Phones: keep the quest log scannable */
+  @media (max-width: 640px) {
+    .card__media {
+      aspect-ratio: 2 / 1;
+    }
+
+    .card--side .card__media,
+    .card--archive .card__media,
+    .card--side .card__stack,
+    .card--archive .card__stack {
+      display: none;
+    }
+
+    .card__body {
+      padding: 16px;
+    }
+
+    .card--side .card__title,
+    .card--archive .card__title {
+      font-size: 1.15rem;
+    }
+  }
+</style>

@@ -1,0 +1,203 @@
+---
+import MissionCard from './MissionCard.astro';
+import { missions, categoryLabel, type MissionCategory, type MissionTier } from '../data/projects';
+
+const groups: { tier: MissionTier; title: string; blurb: string }[] = [
+  { tier: 'main', title: 'Main quests', blurb: 'Production systems and the most complete builds: professional work and serious solo projects.' },
+  { tier: 'game', title: 'Game dev', blurb: 'The passion projects. Built in Unity and the browser, often with my own pixel art.' },
+  { tier: 'side', title: 'Side quests', blurb: 'Focused builds for exploring an idea, a pattern or a framework.' },
+  { tier: 'archive', title: 'Archive', blurb: 'Early work, kept for the record.' },
+];
+
+const filters: ('all' | MissionCategory)[] = ['all', 'professional', 'web', 'api', 'mobile', 'game'];
+const count = (f: 'all' | MissionCategory) => (f === 'all' ? missions.length : missions.filter((m) => m.categories.includes(f)).length);
+---
+
+<section class="section missions" id="missions" aria-labelledby="missions-title" data-region>
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow">03 · Quest log</p>
+      <h2 id="missions-title">Missions completed</h2>
+      <p>
+        Selected projects, each with a dossier covering the problem, my contribution and the stack. Private and
+        proprietary work is marked; I'm happy to walk through it on a call.
+      </p>
+    </header>
+
+    <div class="filters" role="group" aria-label="Filter missions" data-reveal>
+      {
+        filters.map((f, i) => (
+          <button type="button" class="filter" data-filter={f} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {f === 'all' ? 'All' : categoryLabel[f]}
+            <span class="filter__n">{count(f)}</span>
+          </button>
+        ))
+      }
+    </div>
+    <p class="sr-only" aria-live="polite" data-filter-status></p>
+
+    {
+      groups.map((g) => {
+        const list = missions.filter((m) => m.tier === g.tier);
+        if (!list.length) return null;
+        return (
+          <div class="group" data-group>
+            <div class="group__head">
+              <h3 class="group__title">
+                {g.title} <span class="group__n">{list.length}</span>
+              </h3>
+              <p class="group__blurb">{g.blurb}</p>
+            </div>
+            <ul class:list={['grid', { 'grid--featured': g.tier === 'main' }]}>
+              {list.map((m, i) => (
+                <MissionCard mission={m} featured={g.tier === 'main' && i < 2} index={i} />
+              ))}
+            </ul>
+          </div>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+    position: sticky;
+    top: calc(var(--hud-h) + 8px);
+    z-index: 5;
+    padding: 8px;
+    width: fit-content;
+    max-width: 100%;
+    border-radius: 14px;
+    background: rgb(10 12 25 / 0.82);
+    border: 1px solid var(--line);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 550;
+    cursor: pointer;
+    transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  }
+
+  .filter:hover {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .filter[aria-pressed='true'] {
+    color: var(--ember-ink);
+    background: var(--ember);
+  }
+
+  .filter__n {
+    font-family: var(--font-pixel);
+    font-size: 0.62rem;
+    opacity: 0.75;
+  }
+
+  .group + .group {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .group[hidden] {
+    display: none;
+  }
+
+  .group__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .group__title {
+    font-size: var(--step-2);
+  }
+
+  .group__n {
+    font-family: var(--font-pixel);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    vertical-align: middle;
+  }
+
+  .group__blurb {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .grid--featured > :global(.card--featured) {
+    grid-column: span 1;
+  }
+
+  @media (min-width: 1000px) {
+    .grid--featured {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .grid--featured > :global(.card) {
+      grid-column: span 2;
+    }
+
+    .grid--featured > :global(.card--featured) {
+      grid-column: span 3;
+    }
+  }
+
+  @media (max-width: 999px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .filters {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      width: auto;
+      margin-inline: calc(var(--gutter) * -1);
+      border-radius: 0;
+      border-inline: 0;
+      padding-inline: var(--gutter);
+    }
+
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter {
+      flex: none;
+    }
+  }
+</style>

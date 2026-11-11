@@ -1,0 +1,560 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Emblem from '../../components/Emblem.astro';
+import Footer from '../../components/Footer.astro';
+import { missions, tierLabel, statusLabel, categoryLabel, type Mission } from '../../data/projects';
+import { shotsFor } from '../../lib/missionImages';
+import { profile } from '../../data/profile';
+import { url } from '../../lib/url';
+
+export function getStaticPaths() {
+  return missions.map((m, i) => ({
+    params: { slug: m.slug },
+    props: { mission: m, prev: missions[(i - 1 + missions.length) % missions.length], next: missions[(i + 1) % missions.length] },
+  }));
+}
+
+interface Props {
+  mission: Mission;
+  prev: Mission;
+  next: Mission;
+}
+
+const { mission: m, prev, next } = Astro.props;
+const shots = shotsFor(m.slug);
+const full = await Promise.all(shots.map((s) => getImage({ src: s, width: Math.min(1600, s.width), format: 'webp' })));
+const hero = shots[m.cover ?? 0];
+const hasLinks = Boolean(m.links.live || m.links.github || m.links.itch || m.links.docs);
+---
+
+<Base title={m.title} description={`${m.title}: ${m.summary}`} path={`missions/${m.slug}/`}>
+  <article class="dossier">
+    <header class="d-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href={url('#missions')}><Icon name="arrow-left" /> All missions</a>
+        </nav>
+        <div class="d-hero__grid">
+          <div class="d-hero__copy">
+            <div class="d-hero__tags">
+              <span class="tag tag--ember">{tierLabel[m.tier]}</span>
+              <span class="tag">
+                {m.status === 'private' && <Icon name="lock" />}
+                {statusLabel[m.status]}
+              </span>
+              {m.categories.map((c) => <span class="tag tag--dim">{categoryLabel[c]}</span>)}
+            </div>
+            <p class="eyebrow eyebrow--jade">Mission dossier</p>
+            <h1>{m.title}</h1>
+            {m.aka && <p class="d-aka">Formerly “{m.aka}”</p>}
+            <p class="lead">{m.summary}</p>
+            <p class="d-role"><Icon name="user" /> {m.role}</p>
+            <div class="d-actions">
+              {
+                m.links.live && (
+                  <a class="btn btn--primary" href={m.links.live} target="_blank" rel="noopener">
+                    <Icon name="external-link" /> Visit live
+                  </a>
+                )
+              }
+              {
+                m.links.itch && (
+                  <a class="btn btn--primary" href={m.links.itch} target="_blank" rel="noopener">
+                    <Icon name="gamepad-2" /> Play on itch.io
+                  </a>
+                )
+              }
+              {
+                m.links.github && (
+                  <a class="btn" href={m.links.github} target="_blank" rel="noopener">
+                    <Icon name="github" /> Source code
+                  </a>
+                )
+              }
+              {
+                (m.privateRepo || !hasLinks) && (
+                  <a class="btn" href={`mailto:${profile.email}?subject=${encodeURIComponent(`Walkthrough: ${m.title}`)}`}>
+                    <Icon name="mail" /> Request a walkthrough
+                  </a>
+                )
+              }
+            </div>
+            {m.note && <p class="d-note"><Icon name="info" /> {m.note}</p>}
+          </div>
+          <div class="d-hero__media">
+            {
+              m.video ? (
+                <video
+                  src={url(`media/${m.video}`)}
+                  controls
+                  muted
+                  playsinline
+                  preload="none"
+                  poster={hero ? (await getImage({ src: hero, width: 960, format: 'webp' })).src : undefined}
+                  aria-label={`${m.title} demo video`}
+                />
+              ) : hero ? (
+                <Picture
+                  src={hero}
+                  formats={['avif']}
+            fallbackFormat="webp"
+                  widths={[640, 960, 1280]}
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                  alt={m.shots[m.cover ?? 0] ?? ''}
+                  loading="eager"
+                />
+              ) : (
+                <Emblem icon={m.emblem ?? 'sparkles'} seed={m.slug} label={m.title} />
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container d-body">
+      <div class="d-main">
+        <section aria-labelledby="brief">
+          <h2 id="brief" class="d-h"><span class="pixel">01</span> Briefing</h2>
+          <p>{m.context}</p>
+        </section>
+        <section aria-labelledby="problem">
+          <h2 id="problem" class="d-h"><span class="pixel">02</span> The problem</h2>
+          <p>{m.problem}</p>
+        </section>
+        <section aria-labelledby="contrib">
+          <h2 id="contrib" class="d-h"><span class="pixel">03</span> What I did</h2>
+          <ul class="d-list">{m.contribution.map((c) => <li>{c}</li>)}</ul>
+        </section>
+
+        {
+          shots.length > 1 && (
+            <section aria-labelledby="gallery">
+              <h2 id="gallery" class="d-h">
+                <span class="pixel">04</span> Screenshots
+              </h2>
+              <ul class="gallery">
+                {shots.map((s, i) => (
+                  <li>
+                    <a href={full[i].src} data-shot data-alt={m.shots[i] ?? `${m.title} screenshot ${i + 1}`}>
+                      <Picture
+                        src={s}
+                        formats={['avif']}
+            fallbackFormat="webp"
+                        widths={[360, 540]}
+                        sizes="(max-width: 700px) 100vw, 33vw"
+                        alt={m.shots[i] ?? `${m.title} screenshot ${i + 1}`}
+                        loading="lazy"
+                      />
+                      <span class="gallery__zoom" aria-hidden="true">
+                        <Icon name="maximize-2" />
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="d-side">
+        <section class="panel d-stack" aria-labelledby="loadout">
+          <h2 id="loadout" class="d-side__h pixel">Loadout</h2>
+          <dl>
+            {
+              m.stack.map((s) => (
+                <div>
+                  <dt>{s.name}</dt>
+                  <dd>{s.use}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </section>
+      </aside>
+    </div>
+
+    <nav class="container d-pager" aria-label="More missions">
+      <a href={url(`missions/${prev.slug}/`)} class="d-pager__link">
+        <span class="dim"><Icon name="arrow-left" /> Previous mission</span>
+        <strong>{prev.title}</strong>
+      </a>
+      <a href={url(`missions/${next.slug}/`)} class="d-pager__link d-pager__link--next">
+        <span class="dim">Next mission <Icon name="arrow-right" /></span>
+        <strong>{next.title}</strong>
+      </a>
+    </nav>
+  </article>
+
+  <dialog class="lightbox" data-lightbox aria-label="Screenshot viewer">
+    <img src="" alt="" />
+    <div class="lightbox__bar">
+      <button class="icon-btn" type="button" data-lightbox-prev aria-label="Previous screenshot"><Icon name="chevron-left" /></button>
+      <p data-lightbox-caption class="lightbox__cap"></p>
+      <button class="icon-btn" type="button" data-lightbox-next aria-label="Next screenshot"><Icon name="chevron-right" /></button>
+      <button class="icon-btn" type="button" data-lightbox-close aria-label="Close viewer"><Icon name="x" /></button>
+    </div>
+  </dialog>
+
+  <Footer slot="footer" />
+</Base>
+
+<style>
+  .d-hero {
+    padding-top: calc(var(--hud-h) + clamp(1.5rem, 4vw, 3rem));
+    padding-bottom: clamp(2rem, 5vw, 4rem);
+    background:
+      radial-gradient(800px 400px at 80% 0%, rgb(255 143 63 / 0.10), transparent 70%),
+      radial-gradient(700px 500px at 0% 100%, rgb(124 92 255 / 0.10), transparent 70%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 24px;
+  }
+
+  .crumbs a:hover {
+    color: var(--text);
+  }
+
+  .d-hero__grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .d-hero__copy {
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+  }
+
+  .d-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .d-hero__tags :global(.icon) {
+    width: 0.95em;
+    height: 0.95em;
+  }
+
+  .d-hero h1 {
+    font-size: var(--step-4);
+    letter-spacing: -0.035em;
+  }
+
+  .d-aka {
+    margin-top: -6px;
+    color: var(--text-dim);
+  }
+
+  .d-role {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+
+  .d-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .d-note {
+    display: flex;
+    gap: 8px;
+    align-items: start;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    max-width: 60ch;
+  }
+
+  .d-note :global(.icon) {
+    margin-top: 3px;
+  }
+
+  .d-hero__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-2);
+    background: var(--night-750);
+  }
+
+  .d-hero__media :global(img),
+  .d-hero__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .d-hero__media video {
+    object-fit: contain;
+    background: #fff;
+  }
+
+  .d-body {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+    align-items: start;
+  }
+
+  .d-main {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    min-width: 0;
+  }
+
+  .d-main p {
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    max-width: 68ch;
+    line-height: 1.65;
+  }
+
+  .d-h {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: var(--step-2);
+    margin-bottom: 14px;
+  }
+
+  .d-h .pixel {
+    font-size: 0.7rem;
+    color: var(--ember);
+  }
+
+  .d-list {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .d-list li {
+    position: relative;
+    padding-left: 26px;
+    max-width: 72ch;
+  }
+
+  .d-list li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.6em;
+    width: 8px;
+    height: 8px;
+    background: var(--jade);
+    box-shadow: 0 0 10px rgb(94 230 176 / 0.5);
+  }
+
+  .gallery {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .gallery a {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line);
+    background: var(--night-750);
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform var(--t-med) var(--ease-out);
+  }
+
+  .gallery a:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .gallery__zoom {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    background: rgb(6 7 14 / 0.8);
+    color: var(--text);
+    opacity: 0;
+    transition: opacity var(--t-fast);
+  }
+
+  .gallery a:hover .gallery__zoom,
+  .gallery a:focus-visible .gallery__zoom {
+    opacity: 1;
+  }
+
+  .d-side {
+    position: sticky;
+    top: calc(var(--hud-h) + 24px);
+  }
+
+  .d-stack {
+    padding: 22px;
+    border-radius: var(--r-lg);
+  }
+
+  .d-side__h {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--ember);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .d-stack dl {
+    margin: 0;
+  }
+
+  .d-stack dl div {
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .d-stack dt {
+    font-weight: 600;
+  }
+
+  .d-stack dd {
+    margin: 2px 0 0;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+
+  .d-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .d-pager__link {
+    display: grid;
+    gap: 4px;
+    padding: 18px 20px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition: border-color var(--t-fast), background-color var(--t-fast);
+  }
+
+  .d-pager__link:hover {
+    border-color: rgb(255 181 71 / 0.4);
+    background: rgb(255 181 71 / 0.04);
+  }
+
+  .d-pager__link span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+  }
+
+  .d-pager__link strong {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+  }
+
+  .d-pager__link--next {
+    text-align: right;
+    justify-items: end;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    width: min(1200px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    background: var(--night-900);
+    color: var(--text);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(6 7 14 / 0.85);
+  }
+
+  .lightbox img {
+    width: 100%;
+    max-height: calc(100vh - 100px);
+    object-fit: contain;
+    background: #000;
+  }
+
+  .lightbox__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .lightbox__cap {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .d-hero__grid,
+    .d-body {
+      grid-template-columns: 1fr;
+    }
+
+    .d-hero__media {
+      order: -1;
+    }
+
+    .d-side {
+      position: static;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .d-pager {
+      grid-template-columns: 1fr;
+    }
+
+    .d-pager__link--next {
+      text-align: left;
+      justify-items: start;
+    }
+
+    .d-actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

@@ -1,0 +1,191 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import { chapters } from '../data/experience';
+import { missions, categoryLabel } from '../data/projects';
+import { url } from '../lib/url';
+
+const roles = chapters.filter((c) => c.kind === 'work');
+const featured = missions.filter((m) => m.tier === 'main').slice(0, 5);
+const core = ['PHP · Laravel', 'Vue.js · Nuxt', 'REST APIs · Protobuf', 'MySQL · Redis', 'SAP & ERP integrations', 'GitHub Actions · GCP · AWS', 'Docker · Kubernetes (KCNA)'];
+---
+
+<dialog class="qv pixel-frame" id="quickview" aria-labelledby="qv-title">
+  <div class="qv__inner">
+    <header class="qv__head">
+      <div>
+        <p class="eyebrow eyebrow--jade">Quick view · recruiter summary</p>
+        <h2 id="qv-title">{profile.name}</h2>
+        <p class="muted">{profile.role} · {profile.location}</p>
+      </div>
+      <button class="icon-btn" type="button" data-quickview-close aria-label="Close quick view"><Icon name="x" /></button>
+    </header>
+
+    <div class="qv__grid">
+      <section aria-labelledby="qv-exp">
+        <h3 id="qv-exp" class="qv__h">Experience</h3>
+        <ol class="qv__roles">
+          {
+            roles.map((r) => (
+              <li>
+                <strong>{r.title}</strong>
+                <span>{r.org}</span>
+                <span class="dim">
+                  {r.start} – {r.end}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+        <h3 class="qv__h">Education & certification</h3>
+        <ul class="qv__plain">
+          <li>BSc Applied Computer Science, Chuka University</li>
+          <li>
+            {profile.certification.url ? (
+              <a href={profile.certification.url} target="_blank" rel="noopener">{profile.certification.name}</a>
+            ) : (
+              profile.certification.name
+            )}
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="qv-stack">
+        <h3 id="qv-stack" class="qv__h">Core stack</h3>
+        <ul class="chips">{core.map((c) => <li class="chip">{c}</li>)}</ul>
+        <h3 class="qv__h">Selected work</h3>
+        <ul class="qv__plain">
+          {
+            featured.map((m) => (
+              <li>
+                <a href={url(`missions/${m.slug}/`)}>{m.title}</a>
+                <span class="dim"> · {m.categories.map((c) => categoryLabel[c]).join(', ')}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <footer class="qv__foot">
+      <a class="btn btn--primary" href={url(profile.cv)} download><Icon name="download" /> Download CV</a>
+      <a class="btn" href={`mailto:${profile.email}`}><Icon name="mail" /> {profile.email}</a>
+      <a class="btn btn--ghost" href={profile.links.linkedin} target="_blank" rel="noopener"><Icon name="linkedin" /> LinkedIn</a>
+    </footer>
+  </div>
+</dialog>
+
+<style>
+  .qv {
+    width: min(860px, calc(100vw - 24px));
+    max-height: min(88vh, 900px);
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    background: var(--night-850);
+    color: var(--text);
+    box-shadow: var(--shadow-2);
+  }
+
+  .qv[open] {
+    animation: qv-in 280ms var(--ease-out);
+  }
+
+  .qv::backdrop {
+    background: rgb(6 7 14 / 0.7);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .qv__inner {
+    padding: clamp(20px, 4vw, 36px);
+  }
+
+  .qv__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .qv__head h2 {
+    font-size: var(--step-3);
+    margin-block: 8px 4px;
+  }
+
+  .qv__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    padding-block: 24px;
+  }
+
+  .qv__h {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin: 0 0 12px;
+  }
+
+  .qv__h:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  .qv__roles {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .qv__roles li {
+    display: grid;
+    padding-left: 14px;
+    border-left: 2px solid var(--line-strong);
+    font-size: 0.95rem;
+  }
+
+  .qv__roles li:first-child {
+    border-left-color: var(--jade);
+  }
+
+  .qv__plain {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    font-size: 0.95rem;
+  }
+
+  .qv__plain a {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .qv__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 700px) {
+    .qv__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .qv__foot .btn {
+      flex: 1 1 100%;
+    }
+  }
+
+  @keyframes qv-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+</style>

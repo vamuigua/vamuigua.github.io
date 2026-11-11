@@ -1,0 +1,437 @@
+---
+import Icon from './Icon.astro';
+import { branches, tierMeta, type SkillTier } from '../data/skills';
+import { missions } from '../data/projects';
+import { url } from '../lib/url';
+
+const tiers: SkillTier[] = ['pro', 'shipped', 'training'];
+const titleOf = Object.fromEntries(missions.map((m) => [m.slug, m.title]));
+const totals = Object.fromEntries(
+  tiers.map((t) => [t, branches.reduce((n, b) => n + b.skills.filter((s) => s.tier === t).length, 0)]),
+) as Record<SkillTier, number>;
+---
+
+<section class="section skills" id="skills" aria-labelledby="skills-title" data-region>
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow">04 · Skill tree</p>
+      <h2 id="skills-title">Abilities, with receipts</h2>
+      <p>
+        No made-up percentages. Each skill is tiered by where I've actually used it, with evidence and links
+        to the missions that prove it.
+      </p>
+    </header>
+
+    <div class="legend" role="group" aria-label="Highlight skills by tier" data-reveal>
+      {
+        tiers.map((t) => (
+          <button type="button" class:list={['legend__item', `t-${t}`]} data-tier-toggle={t} aria-pressed="false">
+            <span class="legend__gem" aria-hidden="true" />
+            <span class="legend__label">{tierMeta[t].label}</span>
+            <span class="legend__n pixel">{totals[t]}</span>
+          </button>
+        ))
+      }
+      <p class="legend__hint dim">Tap a tier to highlight it, or select any skill to inspect it.</p>
+    </div>
+
+    <div class="tree-wrap">
+      <div class="tree" data-tree>
+        {
+          branches.map((b, bi) => (
+            <section class="branch panel" aria-labelledby={`branch-${b.id}`} data-reveal style={`--reveal-delay:${(bi % 3) * 70}ms`}>
+              <header class="branch__head">
+                <span class="branch__icon">
+                  <Icon name={b.icon} />
+                </span>
+                <div>
+                  <h3 id={`branch-${b.id}`}>{b.name}</h3>
+                  <p>{b.blurb}</p>
+                </div>
+              </header>
+              <ul class="nodes">
+                {b.skills.map((s) => (
+                  <li>
+                    <button
+                      type="button"
+                      class:list={['skill', `t-${s.tier}`]}
+                      data-skill={s.id}
+                      data-tier={s.tier}
+                      data-name={s.name}
+                      data-branch={b.name}
+                      data-evidence={s.evidence}
+                      data-missions={(s.missions ?? []).map((m) => `${m}|${titleOf[m] ?? m}`).join(',')}
+                    >
+                      <span class="skill__gem" aria-hidden="true" />
+                      <span class="skill__name">{s.name}</span>
+                      {s.badge && <span class="skill__badge pixel">{s.badge}</span>}
+                      <span class="skill__tier">{tierMeta[s.tier].short}</span>
+                      <span class="skill__evidence">{s.evidence}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {b.skills.length > 4 && (
+                <button type="button" class="branch__more" data-branch-more aria-expanded="false" hidden>
+                  Show all {b.skills.length} skills <Icon name="chevron-down" />
+                </button>
+              )}
+            </section>
+          ))
+        }
+      </div>
+
+      <aside class="inspector panel pixel-frame" aria-label="Skill details" data-inspector>
+        <p class="eyebrow eyebrow--lavender">Inspector</p>
+        <div aria-live="polite" data-inspector-body>
+          <h3 class="inspector__name">Select a skill</h3>
+          <p class="muted">
+            Pick any node to see where it was used and which missions back it up.
+          </p>
+        </div>
+        <template data-mission-link>
+          <a class="inspector__mission" href=""><span></span> <Icon name="arrow-up-right" /></a>
+        </template>
+      </aside>
+    </div>
+    <p class="skills__base sr-only" data-mission-base>{url('missions/')}</p>
+  </div>
+</section>
+
+<style>
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgb(255 255 255 / 0.02);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: border-color var(--t-fast), color var(--t-fast), background-color var(--t-fast);
+  }
+
+  .legend__item:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+
+  .legend__item[aria-pressed='true'] {
+    color: var(--text);
+    border-color: var(--gem);
+    background: color-mix(in srgb, var(--gem) 12%, transparent);
+  }
+
+  .legend__n {
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+
+  .legend__hint {
+    font-size: 0.85rem;
+    margin-left: 6px;
+  }
+
+  /* tier colours */
+  .t-pro {
+    --gem: var(--ember);
+  }
+
+  .t-shipped {
+    --gem: var(--jade);
+  }
+
+  .t-training {
+    --gem: var(--lavender);
+  }
+
+  .legend__gem,
+  .skill__gem {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    rotate: 45deg;
+    background: var(--gem);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--gem) 60%, transparent);
+  }
+
+  .t-shipped .legend__gem,
+  .t-shipped .skill__gem {
+    background: transparent;
+    border: 2px solid var(--gem);
+  }
+
+  .t-training .legend__gem,
+  .t-training .skill__gem {
+    background: transparent;
+    border: 2px dashed var(--gem);
+    box-shadow: none;
+  }
+
+  .tree-wrap {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .tree {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .branch {
+    padding: 18px;
+    border-radius: var(--r-lg);
+  }
+
+  .branch__head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .branch__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    background: rgb(255 255 255 / 0.05);
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+  }
+
+  .branch h3 {
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .branch__head p {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* node chain */
+  .nodes {
+    list-style: none;
+    position: relative;
+    display: grid;
+    gap: 4px;
+  }
+
+  .nodes::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background: linear-gradient(var(--line-strong), transparent);
+  }
+
+  .skill {
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 20px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color var(--t-fast),
+      border-color var(--t-fast),
+      opacity var(--t-med);
+  }
+
+  .skill__gem {
+    justify-self: center;
+    background-color: var(--night-800);
+  }
+
+  .t-pro .skill__gem {
+    background-color: var(--gem);
+  }
+
+  .skill__name {
+    font-size: 0.93rem;
+    font-weight: 550;
+  }
+
+  .skill__badge {
+    font-size: 0.55rem;
+    padding: 2px 5px;
+    background: var(--lavender-soft);
+    color: var(--lavender);
+  }
+
+  .skill__tier {
+    grid-column: 4;
+    font-size: 0.72rem;
+    color: var(--gem);
+    opacity: 0.85;
+  }
+
+  .skill__badge + .skill__tier {
+    grid-column: 4;
+  }
+
+  .skill__evidence {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .skill:hover,
+  .skill:focus-visible {
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .skill.is-selected {
+    background: color-mix(in srgb, var(--gem) 12%, transparent);
+    border-color: color-mix(in srgb, var(--gem) 45%, transparent);
+  }
+
+  .tree.is-filtered .skill:not(.is-match) {
+    opacity: 0.28;
+  }
+
+  /* Inspector */
+  .inspector {
+    position: sticky;
+    top: calc(var(--hud-h) + 24px);
+    padding: 22px;
+    display: grid;
+    gap: 10px;
+    background: var(--glass-strong);
+    border: 1px solid var(--line-strong);
+    min-height: 220px;
+  }
+
+  .inspector :global(.inspector__name) {
+    font-size: var(--step-2);
+    margin-bottom: 6px;
+  }
+
+  .inspector :global(.inspector__row) {
+    display: grid;
+    gap: 2px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 0.92rem;
+  }
+
+  .inspector :global(.inspector__k) {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .inspector :global(.inspector__mission) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 4px 8px 0 0;
+    font-weight: 600;
+    color: var(--ember);
+    text-decoration: none;
+  }
+
+  .inspector :global(.inspector__mission:hover) {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 1180px) {
+    .tree-wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .inspector {
+      display: none;
+    }
+
+    .skill {
+      grid-template-columns: 20px 1fr auto;
+      cursor: default;
+    }
+
+    .skill__tier {
+      grid-column: 3;
+    }
+
+    .skill__evidence {
+      position: static;
+      width: auto;
+      height: auto;
+      clip: auto;
+      white-space: normal;
+      grid-column: 2 / -1;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: -4px;
+    }
+
+    .skill__badge {
+      display: none;
+    }
+  }
+
+  .branch__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0 0 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .branch__more[hidden] {
+    display: none;
+  }
+
+  .branch__more[aria-expanded='true'] :global(.icon) {
+    transform: rotate(180deg);
+  }
+
+  .branch.is-collapsed .nodes li:nth-child(n + 5) {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .tree {
+      grid-template-columns: 1fr;
+    }
+
+    .legend__hint {
+      display: none;
+    }
+  }
+</style>

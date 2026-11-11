@@ -1,0 +1,270 @@
+---
+import Icon from './Icon.astro';
+import { achievements, secrets } from '../data/achievements';
+---
+
+<section class="section achievements" id="achievements" aria-labelledby="ach-title" data-region>
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow">05 · Achievements</p>
+      <h2 id="ach-title">Milestones unlocked</h2>
+      <p>Verified wins from work, study and game dev. They unlock as you scroll past.</p>
+    </header>
+
+    <div class="ach-progress" data-reveal>
+      <span class="pixel">Progress</span>
+      <span class="ach-progress__bar"><span data-ach-bar></span></span>
+      <span class="pixel" data-ach-count>{achievements.length}/{achievements.length + secrets.length}</span>
+    </div>
+
+    <ul class="ach-grid" data-ach-grid>
+      {
+        achievements.map((a) => (
+          <li class="ach" data-ach={a.id}>
+            <div class="ach__badge" aria-hidden="true">
+              <span class="ach__gem">
+                <Icon name={a.icon} />
+              </span>
+              <span class="ach__lock">
+                <Icon name="lock" />
+              </span>
+            </div>
+            <div class="ach__body">
+              <p class="ach__cat pixel">{a.category}</p>
+              <h3 class="ach__title">{a.title}</h3>
+              <p class="ach__desc">{a.description}</p>
+              <p class="ach__src">
+                {a.href ? (
+                  <a href={a.href} target="_blank" rel="noopener">
+                    {a.source} <Icon name="arrow-up-right" />
+                  </a>
+                ) : (
+                  a.source
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+      {
+        secrets.map((s) => (
+          <li class="ach ach--secret" data-secret={s.id}>
+            <div class="ach__badge" aria-hidden="true">
+              <span class="ach__gem">
+                <Icon name={s.icon} />
+              </span>
+              <span class="ach__lock">
+                <Icon name="lock" />
+              </span>
+            </div>
+            <div class="ach__body">
+              <p class="ach__cat pixel">Secret</p>
+              <h3 class="ach__title">
+                <span class="ach__hidden">???</span>
+                <span class="ach__shown">{s.title}</span>
+              </h3>
+              <p class="ach__desc">{s.hint}</p>
+              <p class="ach__src ach__shown">Unlocked in this browser</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ach-progress {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .ach-progress__bar {
+    flex: 1;
+    max-width: 360px;
+    height: 10px;
+    padding: 2px;
+    border: 1px solid var(--line-strong);
+  }
+
+  .ach-progress__bar span {
+    display: block;
+    height: 100%;
+    width: var(--p, 100%);
+    background: repeating-linear-gradient(90deg, var(--jade) 0 6px, transparent 6px 8px);
+    transition: width var(--t-slow) var(--ease-out);
+  }
+
+  .ach-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+
+  .ach {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    padding: 18px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line);
+    background: linear-gradient(160deg, rgb(32 38 75 / 0.55), rgb(16 19 40 / 0.5));
+    transition:
+      border-color var(--t-med),
+      transform var(--t-med) var(--ease-out);
+  }
+
+  .ach:hover {
+    border-color: rgb(94 230 176 / 0.35);
+    transform: translateY(-2px);
+  }
+
+  .ach__badge {
+    position: relative;
+    width: 52px;
+    height: 52px;
+  }
+
+  .ach__gem,
+  .ach__lock {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 1.35rem;
+    transition:
+      opacity var(--t-med),
+      transform var(--t-slow) var(--ease-out);
+  }
+
+  .ach__gem {
+    color: var(--jade);
+    background: radial-gradient(circle at 50% 40%, rgb(94 230 176 / 0.25), rgb(94 230 176 / 0.06) 70%);
+    border: 2px solid rgb(94 230 176 / 0.5);
+    box-shadow: 0 0 24px -4px rgb(94 230 176 / 0.45);
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
+  }
+
+  .ach__lock {
+    color: var(--text-dim);
+    background: var(--night-750);
+    border: 2px solid var(--line-strong);
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
+    opacity: 0;
+  }
+
+  .ach__cat {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--jade);
+    letter-spacing: 0.06em;
+  }
+
+  .ach__title {
+    font-size: 1.12rem;
+    margin: 4px 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .ach__desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .ach__src {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .ach__src a {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--text-muted);
+  }
+
+  /* Locked state is only applied by JS (content stays visible without JS) */
+  :global(.js) .ach.is-locked .ach__gem {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+
+  :global(.js) .ach.is-locked .ach__lock {
+    opacity: 1;
+  }
+
+  :global(.js) .ach.is-locked .ach__body {
+    opacity: 0.45;
+  }
+
+  .ach__body {
+    transition: opacity var(--t-slow);
+  }
+
+  .ach.is-unlocking {
+    animation: unlock 700ms var(--ease-out);
+  }
+
+  @keyframes unlock {
+    0% {
+      box-shadow: 0 0 0 0 rgb(94 230 176 / 0.6);
+    }
+
+    40% {
+      box-shadow: 0 0 0 6px rgb(94 230 176 / 0.15), 0 0 40px rgb(94 230 176 / 0.35);
+      border-color: rgb(94 230 176 / 0.6);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgb(94 230 176 / 0);
+    }
+  }
+
+  /* Secrets */
+  .ach--secret {
+    border-style: dashed;
+    background: rgb(255 255 255 / 0.015);
+  }
+
+  .ach--secret .ach__cat {
+    color: var(--lavender);
+  }
+
+  .ach--secret .ach__gem {
+    color: var(--lavender);
+    border-color: rgb(185 167 255 / 0.5);
+    background: radial-gradient(circle at 50% 40%, rgb(185 167 255 / 0.25), rgb(185 167 255 / 0.06) 70%);
+    box-shadow: 0 0 24px -4px rgb(185 167 255 / 0.5);
+  }
+
+  .ach--secret .ach__shown {
+    display: none;
+  }
+
+  .ach--secret.is-found .ach__shown {
+    display: inline;
+  }
+
+  .ach--secret.is-found p.ach__shown {
+    display: block;
+  }
+
+  .ach--secret.is-found .ach__hidden {
+    display: none;
+  }
+
+  .ach--secret:not(.is-found) .ach__gem {
+    opacity: 0;
+  }
+
+  .ach--secret:not(.is-found) .ach__lock {
+    opacity: 1;
+  }
+</style>

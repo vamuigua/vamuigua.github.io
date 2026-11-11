@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { url } from '../lib/url';
+---
+
+<Base title="Area not found" path="404/">
+  <section class="lost container">
+    <p class="eyebrow">Error 404</p>
+    <h1>You wandered off the map.</h1>
+    <p class="lead">This area hasn’t been built yet, or the path has moved. The campfire is still burning back at base.</p>
+    <div class="lost__actions">
+      <a class="btn btn--primary" href={url('')}><Icon name="flame" /> Return to camp</a>
+      <a class="btn" href={url('#missions')}><Icon name="scroll-text" /> Browse missions</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    min-height: 80vh;
+    display: grid;
+    align-content: center;
+    gap: 18px;
+    padding-top: var(--hud-h);
+    max-width: 720px;
+  }
+
+  .lost h1 {
+    font-size: var(--step-4);
+  }
+
+  .lost__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+</style>
