@@ -40,7 +40,13 @@ const core = ['PHP · Laravel', 'Vue.js · Nuxt', 'REST APIs · Protobuf', 'MySQ
         <h3 class="qv__h">Education & certification</h3>
         <ul class="qv__plain">
           <li>BSc Applied Computer Science, Chuka University</li>
-          <li>{profile.certification.name}</li>
+          <li>
+            {profile.certification.url ? (
+              <a href={profile.certification.url} target="_blank" rel="noopener">{profile.certification.name}</a>
+            ) : (
+              profile.certification.name
+            )}
+          </li>
         </ul>
       </section>
 

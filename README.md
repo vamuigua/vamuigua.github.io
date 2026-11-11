@@ -25,7 +25,7 @@ All copy lives in typed data files, so most updates never touch a component:
 
 | File | What |
 | --- | --- |
-| `src/data/profile.ts` | Name, role, bio, links, certification, current objective, traits |
+| `src/data/profile.ts` | Name, role, bio, links, certification, traits and the “Current quest” card (set `currentObjective.show` to `false` to hide it) |
 | `src/data/experience.ts` | Career chapters (roles, dates, key quests, stack) |
 | `src/data/projects.ts` | Missions: summary, problem, contribution, stack, links, screenshot alt text |
 | `src/data/skills.ts` | Skill tree: tier (`pro` / `shipped` / `training`) + evidence |

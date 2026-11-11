@@ -3,15 +3,22 @@ import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
 import portrait from '../assets/profile/victor.jpg';
 import { profile } from '../data/profile';
+import { missions } from '../data/projects';
+import { url } from '../lib/url';
 
-const sheet = [
+const sheet: { k: string; v: string; href?: string }[] = [
   { k: 'Class', v: profile.role },
   { k: 'Guild', v: profile.currentGuild },
   { k: 'Base', v: profile.location },
   { k: 'In the field since', v: String(profile.professionalSince) },
   { k: 'Main stack', v: 'Laravel · Vue · Redis · MySQL' },
-  { k: 'Certification', v: 'KCNA (CNCF)' },
+  { k: 'Certification', v: 'KCNA (CNCF)', href: profile.certification.url || undefined },
 ];
+
+const quest = profile.currentObjective;
+const done = quest.steps.filter((s) => s.state === 'done').length;
+const stateLabel = { done: 'Completed', active: 'In progress', next: 'Up next' } as const;
+const missionTitle = (slug: string) => missions.find((m) => m.slug === slug)?.title ?? slug;
 ---
 
 <section class="section profile" id="profile" aria-labelledby="profile-title" data-region>
@@ -45,7 +52,16 @@ const sheet = [
               sheet.map((row) => (
                 <div>
                   <dt>{row.k}</dt>
-                  <dd>{row.v}</dd>
+                  <dd>
+                    {row.href ? (
+                      <a href={row.href} target="_blank" rel="noopener" class="sheet__link">
+                        {row.v} <Icon name="arrow-up-right" />
+                        <span class="sr-only">(verify on Credly, opens in new tab)</span>
+                      </a>
+                    ) : (
+                      row.v
+                    )}
+                  </dd>
                 </div>
               ))
             }
@@ -75,15 +91,61 @@ const sheet = [
           }
         </ul>
 
-        <div class="objective panel" data-reveal>
-          <div class="objective__marker" aria-hidden="true">!</div>
-          <div class="objective__body">
-            <p class="eyebrow eyebrow--jade">Current objective</p>
-            <h3>{profile.currentObjective.title}</h3>
-            <p class="muted">{profile.currentObjective.detail}</p>
-            <ul class="chips">{profile.currentObjective.items.map((i) => <li class="chip">{i}</li>)}</ul>
-          </div>
-        </div>
+        {
+          quest.show && (
+            <article class="objective panel" data-reveal aria-labelledby="quest-title">
+              <div class="objective__marker" aria-hidden="true">!</div>
+              <div class="objective__body">
+                <div class="objective__head">
+                  <p class="eyebrow eyebrow--jade">{quest.label}</p>
+                  <p class="objective__progress pixel" aria-label={`${done} of ${quest.steps.length} quest steps complete`}>
+                    <span class="objective__bar" aria-hidden="true">
+                      <span style={`width:${(done / quest.steps.length) * 100}%`} />
+                    </span>
+                    {done}/{quest.steps.length}
+                  </p>
+                </div>
+                <h3 id="quest-title">{quest.title}</h3>
+                <p class="muted">{quest.intro}</p>
+
+                <blockquote class="objective__rule">
+                  <span class="pixel">House rule</span>
+                  <p>{quest.houseRule}</p>
+                </blockquote>
+
+                <ol class="steps">
+                  {quest.steps.map((s) => {
+                    const slug = 'mission' in s ? s.mission : undefined;
+                    return (
+                      <li class:list={['step', `step--${s.state}`]}>
+                        <span class="step__box" aria-hidden="true">
+                          {s.state === 'done' && <Icon name="check" />}
+                        </span>
+                        <span class="sr-only">{stateLabel[s.state]}:</span>
+                        <span class="step__text">
+                          {s.state === 'active' && <span class="step__tag pixel">In progress</span>}
+                          {s.state === 'next' && <span class="step__tag pixel">Next</span>}
+                          {s.text}
+                          {slug && (
+                            <a class="step__link" href={url(`missions/${slug}/`)}>
+                              {missionTitle(slug)} <Icon name="arrow-up-right" />
+                            </a>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+
+                <ul class="chips" aria-label="Quest loadout">
+                  {quest.loadout.map((i) => (
+                    <li class="chip">{i}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          )
+        }
       </div>
     </div>
   </div>
@@ -271,11 +333,156 @@ const sheet = [
 
   .objective__body {
     display: grid;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .objective__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+
+  .objective__progress {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
+    margin: 0;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+
+  .objective__bar {
+    width: 72px;
+    height: 8px;
+    padding: 1px;
+    border: 1px solid rgb(94 230 176 / 0.4);
+  }
+
+  .objective__bar span {
+    display: block;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, var(--jade) 0 5px, transparent 5px 7px);
   }
 
   .objective h3 {
-    font-size: var(--step-1);
+    font-size: var(--step-2);
+  }
+
+  .objective__rule {
+    margin: 4px 0;
+    padding: 12px 14px;
+    border-left: 3px solid var(--ember);
+    background: rgb(255 181 71 / 0.06);
+  }
+
+  .objective__rule .pixel {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--ember);
+  }
+
+  .objective__rule p {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .steps {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+    margin: 2px 0 4px;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 12px;
+    align-items: start;
+    font-size: 0.95rem;
+  }
+
+  .step__box {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    border: 2px solid var(--line-strong);
+    font-size: 0.8rem;
+  }
+
+  .step--done .step__box {
+    border-color: var(--jade);
+    background: var(--jade);
+    color: #062016;
+  }
+
+  .step--done .step__text {
+    color: var(--text-muted);
+  }
+
+  .step--active .step__box {
+    border-color: var(--ember);
+    box-shadow: 0 0 12px rgb(255 181 71 / 0.45);
+    animation: pulse 2s var(--ease-in-out) infinite;
+  }
+
+  .step--active .step__text {
+    color: var(--text);
+  }
+
+  .step--next .step__box {
+    border-style: dashed;
+  }
+
+  .step--next .step__text {
+    color: var(--text-dim);
+  }
+
+  .step__tag {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 2px 6px;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    background: var(--ember-soft);
+    color: var(--ember);
+  }
+
+  .step--next .step__tag {
+    background: rgb(255 255 255 / 0.05);
+    color: var(--text-dim);
+  }
+
+  .step__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--ember);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .step__link:hover {
+    text-decoration: underline;
+  }
+
+  .sheet__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--text);
+    text-decoration-color: rgb(255 181 71 / 0.5);
   }
 
   @keyframes float {
@@ -314,6 +521,12 @@ const sheet = [
 
     .traits {
       grid-template-columns: 1fr;
+    }
+
+    .objective {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 18px;
     }
   }
 </style>

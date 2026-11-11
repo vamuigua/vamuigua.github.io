@@ -128,7 +128,7 @@ The world is a **pixel-art highland valley at dusk**. Victor's character sits at
 ## Items for Victor to review
 
 0. **Private & employer repos**: only PowerWatch, Meeting Minutes and GravityPoint from your private repos are shown, with no links. Solutech-Limited org repos are deliberately excluded; Solutech work stays at CV level, as you chose.
-1. **KCNA**: confirmed on the CV. Add the Credly/verification URL and date in `src/data/profile.ts` if you'd like it linked.
+1. **KCNA**: ✅ Credly link added; the badge now links from the character sheet, achievements and quick view.
 2. **Offline demos**: Gemvist Motors, REMSS and myParking. Renew the domain or redeploy, then add `live` URLs back in `src/data/projects.ts`.
 3. **RabbitMQ and Nginx** appear on the old site but not on the current CV. They are shown under “shipped in projects”; remove them if you'd rather not claim them.
 4. **Metrics** (40%, 25%, ~80%, 15%) are taken from the CV. Confirm you're comfortable showing them publicly.

@@ -31,14 +31,40 @@ export const profile = {
   certification: {
     name: 'Kubernetes and Cloud Native Associate (KCNA)',
     issuer: 'CNCF / The Linux Foundation',
-    // TODO(Victor): add the Credly / verification URL to link the badge.
-    url: '' as string,
+    url: 'https://www.credly.com/badges/c0dbadcb-cd47-4a6e-bef5-c53f033a4fe3/public_url' as string,
   },
+  /**
+   * "Current quest" card in the Character profile section.
+   * Set `show: false` to hide the whole card; nothing else depends on it.
+   */
   currentObjective: {
-    title: 'Expanding into the Microsoft stack',
-    detail:
-      'Building with .NET Core, ASP.NET Core Web API and Entity Framework Core, alongside Angular and Azure fundamentals.',
-    items: ['.NET Core', 'ASP.NET Core Web API', 'EF Core', 'Angular', 'Azure'],
+    show: true,
+    label: 'Current quest · AI crafting',
+    title: 'Tinkering with AI to build products people can trust',
+    intro:
+      'Every good RPG has a crafting system. Mine is AI: I take a tedious, real-world chore, combine a language model with solid engineering, and see whether it can become a product people would actually rely on.',
+    houseRule: 'The AI never invents a fact. If it doesn’t know, it says so.',
+    steps: [
+      {
+        state: 'done',
+        text: 'Automated ~80% of manual transcript clean-up at Zydii with OpenAI-powered scripts',
+        mission: 'zydii',
+      },
+      {
+        state: 'done',
+        text: 'Shipped Meeting Minutes: recordings in, editable minutes out, with no made-up owners or deadlines',
+        mission: 'meeting-minutes',
+      },
+      {
+        state: 'active',
+        text: 'Experimenting with guardrails and provider-agnostic designs that keep AI output honest and testable',
+      },
+      {
+        state: 'next',
+        text: 'Find the next everyday chore worth handing to a well-behaved model',
+      },
+    ],
+    loadout: ['LLM APIs', 'Speech-to-text', 'Prompt guardrails', 'Provider interfaces', 'Fixture-driven tests'],
   },
   traits: [
     {

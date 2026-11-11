@@ -1,3 +1,5 @@
+import { profile } from './profile';
+
 /**
  * Verified milestones (CV, GitHub, itch.io). Titles are playful; descriptions are factual.
  */
@@ -19,6 +21,7 @@ export const achievements: Achievement[] = [
     icon: 'shield-check',
     category: 'Certification',
     source: 'CNCF / Linux Foundation',
+    href: profile.certification.url || undefined,
   },
   {
     id: 'keeper',
