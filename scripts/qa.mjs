@@ -5,7 +5,7 @@
 import { chromium } from 'playwright-core';
 import { readFileSync } from 'node:fs';
 
-const BASE = process.env.SITE_URL ?? 'http://localhost:4321/devfolio/';
+const BASE = process.env.SITE_URL ?? 'http://localhost:4321/';
 const CHROME = process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const axeSource = readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
 
@@ -82,11 +82,14 @@ for (const vp of viewports) {
   }
   report(true, `checked ${seen.size} internal URLs`);
   // legacy redirects
-  for (const legacy of ['zydii.html', 'ninja_danger.html', 'motorshop.html']) {
+  for (const legacy of ['devfolio/zydii.html', 'devfolio/ninja_danger.html', 'devfolio/motorshop.html', 'devfolio/missions/powerwatch/']) {
     await page.goto(BASE + legacy);
-    await page.waitForURL(/missions\//, { timeout: 5000 }).catch(() => {});
-    report(/missions\/[\w-]+\/$/.test(page.url()), `legacy /${legacy} redirects → ${page.url()}`);
+    await page.waitForURL((u) => !u.pathname.startsWith('/devfolio'), { timeout: 5000 }).catch(() => {});
+    report(/missions\/[\w-]+\/$/.test(page.url()) && !page.url().includes('/devfolio/'), `legacy /${legacy} redirects → ${page.url()}`);
   }
+  await page.goto(BASE + 'devfolio/');
+  await page.waitForURL((u) => !u.pathname.startsWith('/devfolio'), { timeout: 5000 }).catch(() => {});
+  report(new URL(page.url()).pathname === '/', `legacy /devfolio/ redirects → ${page.url()}`);
   await page.close();
 }
 

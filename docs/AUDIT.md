@@ -4,7 +4,7 @@ _Prepared 2026-11-04 on branch `feature/game-inspired-portfolio-redesign`. Produ
 
 ## Sources reviewed
 
-- Live site: https://vamuigua.github.io/devfolio/ (GitHub Pages, legacy build from `main` /root)
+- Live site at the time of the audit: https://vamuigua.github.io/devfolio/ (GitHub Pages, legacy build from `main` /root). The site now lives at https://vamuigua.github.io/
 - Repository: `vamuigua/devfolio`: 13 HTML pages, Bootstrap 4 + jQuery template, ~26 MB of assets
 - GitHub profile: 155 public repos (106 non-fork), 6 pinned, profile README
 - CV: the Google Drive copy linked from the live site is **outdated**. The updated CV Victor supplied on 2026-11-04 is the source of truth (Solutech role, KCNA, .NET/Angular learning path). Copy is paraphrased, not lifted.

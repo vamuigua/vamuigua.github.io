@@ -1,10 +1,15 @@
-// Generates public/<legacy>.html redirect stubs so links to the original
-// portfolio's project pages (e.g. /devfolio/zydii.html) keep working.
-import { writeFileSync, mkdirSync } from 'node:fs';
+// The site used to live at https://vamuigua.github.io/devfolio/ (first as a
+// Bootstrap site, then as this Astro site). It now lives at the domain root.
+// This writes redirect stubs into public/devfolio/ so old links keep working:
+//   /devfolio/                 -> /
+//   /devfolio/<old>.html       -> /missions/<slug>/   (original Bootstrap pages)
+//   /devfolio/missions/<slug>/ -> /missions/<slug>/
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 
-const BASE = '/devfolio/';
-const map = {
-  'index.html': null, // handled by Astro
+const SITE = 'https://vamuigua.github.io';
+const OUT = 'public/devfolio';
+
+const legacyPages = {
   'zydii.html': 'zydii',
   'remss.html': 'remss',
   'myparking.html': 'myparking',
@@ -19,17 +24,22 @@ const map = {
   'emall.html': 'e-mall',
 };
 
-mkdirSync('public', { recursive: true });
-for (const [file, slug] of Object.entries(map)) {
-  if (!slug) continue;
-  const to = `${BASE}missions/${slug}/`;
-  writeFileSync(
-    `public/${file}`,
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title>` +
-      `<link rel="canonical" href="https://vamuigua.github.io${to}">` +
-      `<meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${to}">` +
-      `<script>location.replace(${JSON.stringify(to)} + location.hash)</script></head>` +
-      `<body><p>This page moved to <a href="${to}">${to}</a>.</p></body></html>\n`,
-  );
+const slugs = [...readFileSync('src/data/projects.ts', 'utf8').matchAll(/^\s*slug:\s*'([\w-]+)'/gm)].map((m) => m[1]);
+
+const stub = (to) =>
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title>` +
+  `<link rel="canonical" href="${SITE}${to}">` +
+  `<meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${to}">` +
+  `<script>location.replace(${JSON.stringify(to)} + location.hash)</script></head>` +
+  `<body><p>This page moved to <a href="${to}">${SITE}${to}</a>.</p></body></html>\n`;
+
+function write(path, to) {
+  mkdirSync(path.replace(/\/[^/]+$/, ''), { recursive: true });
+  writeFileSync(path, stub(to));
 }
-console.log('redirect stubs written');
+
+rmSync(OUT, { recursive: true, force: true });
+write(`${OUT}/index.html`, '/');
+for (const [file, slug] of Object.entries(legacyPages)) write(`${OUT}/${file}`, `/missions/${slug}/`);
+for (const slug of slugs) write(`${OUT}/missions/${slug}/index.html`, `/missions/${slug}/`);
+console.log(`redirect stubs written: ${1 + Object.keys(legacyPages).length + slugs.length}`);

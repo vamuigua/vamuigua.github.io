@@ -5,7 +5,7 @@
 import { chromium } from 'playwright-core';
 import sharp from 'sharp';
 
-const BASE = process.env.SITE_URL ?? 'http://localhost:4321/devfolio/';
+const BASE = process.env.SITE_URL ?? 'http://localhost:4321/';
 const CHROME = process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const browser = await chromium.launch({ executablePath: CHROME });
